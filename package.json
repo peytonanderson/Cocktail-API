@@ -1,0 +1,26 @@
+{
+  "name": "cocktail-api",
+  "version": "1.0.0",
+  "description": "API for cocktail recipes",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "pretest": "eslint ./src --fix",
+    "test": "echo \"Tests complete\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peytonanderson/Cocktail-API.git"
+  },
+  "author": "Peyton Anderson",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/peytonanderson/Cocktail-API/issues"
+  },
+  "homepage": "https://github.com/peytonanderson/Cocktail-API#readme",
+  "dependencies": {
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-plugin-import": "^2.24.2"
+  }
+}
