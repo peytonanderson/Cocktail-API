@@ -115,7 +115,7 @@
             <label for="name">Name: </label>
             <input id="nameField" type="text" name="name" />
             <label for="age">Age: </label>
-            <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
+            <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
             <input type="submit" value="Add User" />
         </form>
         <form id="userForm" action="/getUsers" method="get">
@@ -129,8 +129,20 @@
             </select>
             <input type="submit" value="Get User" />
         </form>
-        </section>
+    </section>
     <section id="content">
+    </section>
+
+    <header>
+        <div id="fullSearch" class="search"></div>
+        <h1 id="title">Cocktail API</h1>
+        <div id="userSearch" class="search"></div>
+    </header>
+    <section id="fullList">
+    </section>
+    <section id="randomDrink">
+    </section>
+    <section id="userList">
     </section>
 </body>
 </html>
