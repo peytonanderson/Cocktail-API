@@ -23,7 +23,7 @@ const getUserDrink = (request, response, body) => {
   const drinks = [];
   const text = body.userDrinkSearchText.innerHTML.toLowerCase();
   for (let i = 0; i < userDrinks.length; i++) {
-    if (userDrinks[i].name.toLowerCase().contains(text)) {
+    if (userDrinks[i].name.toLowerCase().includes(text)) {
       drinks.push(userDrinks[i]);
     }
   }
