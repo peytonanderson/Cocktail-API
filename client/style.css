@@ -6,16 +6,42 @@ html, body {
 }
 
 #top {
-  text-align: center;
-  margin: 0 auto;
+    text-align: center;
+    margin: 0 auto;
 }
 
 #top h1 {
-  font-size: 2em;
+    font-size: 2em;
 }
 
 #content {
-  margin-top: 100px;
-  font-size: 2em;
-  text-align: center;
+    margin-top: 100px;
+    font-size: 2em;
+    text-align: center;
+}
+
+#title {
+
+}
+
+form {
+
+}
+
+#flexContainer {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.flexItems {
+    flex: 100%;
+}
+
+#fullList, #userList {
+    flex: 1 0 0;
+}
+
+#mainDrink {
+    flex: 1.5 0 0px;
 }
