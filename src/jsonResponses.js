@@ -1,4 +1,4 @@
-const users = {};
+const userDrinks = {};
 
 const respondJSON = (request, response, status, object) => {
   response.writeHead(status, { 'Content-Type': 'application/json' });
@@ -11,9 +11,33 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
-const getUsers = (request, response) => {
+const getDrink = (request, response) => {
   const responseJSON = {
-    users,
+    id: 'getDrink',
+  };
+
+  respondJSON(request, response, 200, responseJSON);
+};
+
+const getUserDrink = (request, response, body) => {
+  const drinks = [];
+  const text = body.userDrinkSearchText.innerHTML.toLowerCase();
+  for (let i = 0; i < userDrinks.length; i++) {
+    if (userDrinks[i].name.toLowerCase().contains(text)) {
+      drinks.push(userDrinks[i]);
+    }
+  }
+  const responseJSON = {
+    id: 'getUserDrink',
+    drinks,
+  };
+
+  respondJSON(request, response, 200, responseJSON);
+};
+
+const getRandomDrink = (request, response) => {
+  const responseJSON = {
+    id: 'getRandomDrink',
   };
 
   respondJSON(request, response, 200, responseJSON);
@@ -28,7 +52,15 @@ const getNotReal = (request, response) => {
   respondJSON(request, response, 404, responseJSON);
 };
 
-const getUsersMeta = (request, response) => {
+const getDrinkMeta = (request, response) => {
+  respondJSONMeta(request, response, 200);
+};
+
+const getUserDrinkMeta = (request, response) => {
+  respondJSONMeta(request, response, 200);
+};
+
+const getRandomDrinkMeta = (request, response) => {
   respondJSONMeta(request, response, 200);
 };
 
@@ -36,29 +68,29 @@ const getNotRealMeta = (request, response) => {
   respondJSONMeta(request, response, 404);
 };
 
-const addUser = (request, response, body) => {
+const addUserDrink = (request, response, body) => {
   const responseJSON = {
-    message: 'Name and age are both required.',
+    message: 'Name and ingredients are both required.',
+    drinksList: [],
   };
 
-  if (!body.name || !body.age) {
+  if (!body.name || !body.ingredients) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
 
   let responseCode = 201;
 
-  if (users[body.name]) {
+  if (userDrinks[body.name]) {
     responseCode = 204;
   } else {
-    users[body.name] = {};
+    userDrinks[body.name] = body.ingredients;
   }
-
-  users[body.name].name = body.name;
-  users[body.name].age = body.age;
 
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
+    responseJSON.drinksList = userDrinks;
+    console.log(responseJSON);
     return respondJSON(request, response, responseCode, responseJSON);
   }
 
@@ -66,9 +98,13 @@ const addUser = (request, response, body) => {
 };
 
 module.exports = {
-  getUsers,
+  getDrink,
+  getUserDrink,
+  getRandomDrink,
   getNotReal,
-  getUsersMeta,
+  getDrinkMeta,
+  getUserDrinkMeta,
+  getRandomDrinkMeta,
   getNotRealMeta,
-  addUser,
+  addUserDrink,
 };

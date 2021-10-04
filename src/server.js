@@ -7,7 +7,7 @@ const jsonHandler = require('./jsonResponses.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addUser') {
+  if (parsedUrl.pathname === '/addUserDrink') {
     const res = response;
     const body = [];
 
@@ -24,14 +24,52 @@ const handlePost = (request, response, parsedUrl) => {
     request.on('end', () => {
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
-      jsonHandler.addUser(request, res, bodyParams);
+      jsonHandler.addUserDrink(request, res, bodyParams);
     });
   }
 };
 
 const handleHead = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/getUsers') {
-    jsonHandler.getUsersMeta(request, response);
+  if (parsedUrl.pathname === '/getDrink') {
+    const res = response;
+    const body = [];
+
+    request.on('error', (err) => {
+      console.dir(err);
+      res.statusCode = 400;
+      res.end();
+    });
+
+    request.on('data', (chunk) => {
+      body.push(chunk);
+    });
+
+    request.on('end', () => {
+      const bodyString = Buffer.concat(body).toString();
+      const bodyParams = query.parse(bodyString);
+      jsonHandler.getDrinkMeta(request, res, bodyParams);
+    });
+  } else if (parsedUrl.pathname === '/getUserDrink') {
+    const res = response;
+    const body = [];
+
+    request.on('error', (err) => {
+      console.dir(err);
+      res.statusCode = 400;
+      res.end();
+    });
+
+    request.on('data', (chunk) => {
+      body.push(chunk);
+    });
+
+    request.on('end', () => {
+      const bodyString = Buffer.concat(body).toString();
+      const bodyParams = query.parse(bodyString);
+      jsonHandler.getUserDrinkMeta(request, res, bodyParams);
+    });
+  } else if (parsedUrl.pathname === '/getRandomDrink') {
+    jsonHandler.getRandomDrink(request, response);
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.getNotRealMeta(request, response);
   } else {
@@ -42,8 +80,28 @@ const handleHead = (request, response, parsedUrl) => {
 const handleGet = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/style.css') {
     htmlHandler.getCSS(request, response);
-  } else if (parsedUrl.pathname === '/getUsers') {
-    jsonHandler.getUsers(request, response);
+  } else if (parsedUrl.pathname === '/getDrink') {
+    jsonHandler.getDrink(request, response);
+  } else if (parsedUrl.pathname === '/getUserDrink') {
+    const res = response;
+    const body = [];
+
+    request.on('error', (err) => {
+      console.dir(err);
+      res.statusCode = 400;
+      res.end();
+    });
+
+    request.on('data', (chunk) => {
+      body.push(chunk);
+    });
+
+    request.on('end', () => {
+      const bodyString = Buffer.concat(body).toString();
+      const bodyParams = query.parse(bodyString);
+      jsonHandler.getUserDrink(request, res, bodyParams);
+      console.log(bodyParams);
+    });
   } else if (parsedUrl.pathname === '/notReal') {
     jsonHandler.getNotReal(request, response);
   } else {
