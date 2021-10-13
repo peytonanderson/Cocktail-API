@@ -52,7 +52,7 @@ const getDrink = (request, response, params) => {
     ingredients: [],
   };
 
-  if (params.drink == undefined) {
+  if (params.drink === undefined) {
     respondJSON(request, response, 200, responseJSON);
     return;
   }
