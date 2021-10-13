@@ -6,6 +6,27 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
+const urlStruct = {
+  GET: {
+    '/': htmlHandler.getIndex,
+    '/style.css': htmlHandler.getCSS,
+    '/getDrink': jsonHandler.getDrink,
+    '/getUserDrink': jsonHandler.getUserDrink,
+    '/getRandomDrink': jsonHandler.getRandomDrink,
+    notFound: jsonHandler.getNotReal,
+  },
+  HEAD: {
+    '/getDrink': jsonHandler.getDrinkMeta,
+    '/getUserDrink': jsonHandler.getUserDrinkMeta,
+    '/getRandomDrink': jsonHandler.getRandomDrinkMeta,
+    notFound: jsonHandler.getNotRealMeta,
+  },
+  POST: {
+    '/addUserDrink': jsonHandler.addUserDrink,
+    notFound: jsonHandler.getNotReal,
+  },
+};
+
 const handlePost = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/addUserDrink') {
     const res = response;
@@ -29,94 +50,16 @@ const handlePost = (request, response, parsedUrl) => {
   }
 };
 
-const handleHead = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/getDrink') {
-    const res = response;
-    const body = [];
-
-    request.on('error', (err) => {
-      console.dir(err);
-      res.statusCode = 400;
-      res.end();
-    });
-
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    });
-
-    request.on('end', () => {
-      const bodyString = Buffer.concat(body).toString();
-      const bodyParams = query.parse(bodyString);
-      jsonHandler.getDrinkMeta(request, res, bodyParams);
-    });
-  } else if (parsedUrl.pathname === '/getUserDrink') {
-    const res = response;
-    const body = [];
-
-    request.on('error', (err) => {
-      console.dir(err);
-      res.statusCode = 400;
-      res.end();
-    });
-
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    });
-
-    request.on('end', () => {
-      const bodyString = Buffer.concat(body).toString();
-      const bodyParams = query.parse(bodyString);
-      jsonHandler.getUserDrinkMeta(request, res, bodyParams);
-    });
-  } else if (parsedUrl.pathname === '/getRandomDrink') {
-    jsonHandler.getRandomDrink(request, response);
-  } else if (parsedUrl.pathname === '/notReal') {
-    jsonHandler.getNotRealMeta(request, response);
-  } else {
-    htmlHandler.getIndex(request, response);
-  }
-};
-
-const handleGet = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/style.css') {
-    htmlHandler.getCSS(request, response);
-  } else if (parsedUrl.pathname === '/getDrink') {
-    jsonHandler.getDrink(request, response);
-  } else if (parsedUrl.pathname === '/getUserDrink') {
-    const res = response;
-    const body = [];
-
-    request.on('error', (err) => {
-      console.dir(err);
-      res.statusCode = 400;
-      res.end();
-    });
-
-    request.on('data', (chunk) => {
-      body.push(chunk);
-    });
-
-    request.on('end', () => {
-      const bodyString = Buffer.concat(body).toString();
-      const bodyParams = query.parse(bodyString);
-      jsonHandler.getUserDrink(request, res, bodyParams);
-      console.log(bodyParams);
-    });
-  } else if (parsedUrl.pathname === '/notReal') {
-    jsonHandler.getNotReal(request, response);
-  } else {
-    htmlHandler.getIndex(request, response);
-  }
-};
-
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
-  if (request.method === 'POST') {
+  const params = query.parse(parsedUrl.query);
+
+  if (urlStruct[request.method][parsedUrl.pathname] && request.method === 'POST') {
     handlePost(request, response, parsedUrl);
-  } else if (request.method === 'HEAD') {
-    handleHead(request, response, parsedUrl);
+  } else if (urlStruct[request.method][parsedUrl.pathname]) { // GET or HEAD
+    urlStruct[request.method][parsedUrl.pathname](request, response, params);
   } else {
-    handleGet(request, response, parsedUrl);
+    urlStruct[request.method].notFound(request, response);
   }
 };
 

@@ -1,8 +1,17 @@
 html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-family: "Trebuchet MS", Verdana, sans-serif;
+    color: #2E0052;
+    background-color: #EDD6FF;
+}
+
+h1 {
+    text-align: center;
 }
 
 #content {
@@ -19,20 +28,39 @@ form {
 
 }
 
+#addDrinkForm {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+input {
+    border-radius: 15px;
+    padding: 10px;
+    margin: 0.5em;
+}
+
 #flexContainer {
     display: flex;
     justify-content: center;
     text-align: center;
+    align-items: flex-start;
 }
 
 .flexItems {
     flex: 100%;
-}
-
-#fullList, #userList {
+    margin: 1em;
     flex: 1 0 0;
 }
 
-#mainDrink {
-    flex: 1.5 0 0px;
+.flexItems div {
+    max-height: 19em;
+    background-color: #CA85FF;
+    margin-top: 0.5em;
+    padding: 0.5em;
+}
+
+#drinks, #userDrinks {
+    overflow-y: scroll;
 }

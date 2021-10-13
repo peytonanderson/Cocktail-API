@@ -6,45 +6,45 @@
   
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
     <script type="text/babel">
-        const cocktails = {
-          "Bellini": "3 1/3 oz Sparking Wine, 1 2/3 oz Peach Puree",
-          "Black Russian": "1 2/3 oz Vodka, 2/3 oz Coffee Liquer",
-          "Screwdriver": "1 2/3 oz Vodka, 3 1/3 oz Orange Juice, 1 slice Orange",
-        };
-
         const parseJSON = (xhr) => {
             if (xhr.response) {
                 const obj = JSON.parse(xhr.response);
 
-                if (obj.message) {
-                    const p = document.createElement('p');
-                    p.textContent = `Message: ${obj.message}`;
-                    content.appendChild(p);
-                }
+                //if (obj.message) {
+                //    const p = document.createElement('p');
+                //    p.textContent = `Message: ${obj.message}`;
+                //    content.appendChild(p);
+                //}
 
                 if (xhr.status == 200) {
-                  let drinksList;
+                  let output;
                   switch (obj.id) {
                       case "getDrink":
-                          let text = document.querySelector('#drinkSearchText').innerHTML.toLowerCase();
-                          drinksList = document.querySelector('#drinks');
-                          drinksList.innerHTML = '';
-                          for (let drink in cocktails) {
-                            if (drink.toLowerCase().includes(text)) {
-                                drinksList.innerHTML += `<h2>${drink}</h2><p>${cocktails[drink]}</p>`;
+                          output = document.querySelector('#drinks');
+                          output.innerHTML = '';
+                          if (obj.names.length == 0) {
+                            output.innerHTML = `<h2>No drinks found</h2>`;
+                          } else {
+                            for (let i = 0; i < obj.names.length; i++) {
+                              output.innerHTML += `<h2>${obj.names[i]}</h2><p>${obj.ingredients[i]}</p>`;
                             }
                           }
                           break;
                       case "getUserDrink":
-                          drinksList = document.querySelector('#userDrinks');
-                          drinksList = '';
-                          for (let drink in obj.drinks.length) {
-                            drinksList.innerHTML += `<h2>${drink}</h2><p>${obj.drinks[drink]}</p>`;
+                          output = document.querySelector('#userDrinks');
+                          output.innerHTML = '';
+                          if (obj.names.length == 0) {
+                            output.innerHTML = `<h2>No drinks found</h2>`;
+                          } else {
+                            for (let i = 0; i < obj.names.length; i++) {
+                              output.innerHTML += `<h2>${obj.names[i]}</h2><p>${obj.ingredients[i]}</p>`;
+                            }
                           }
                           break;
                       case "getRandomDrink":
-                          document.querySelector('#mainDrinkName').innerHTML = cocktails[Math.random()].name;
-                          document.querySelector('#mainDrinkIngredients').innerHTML = cocktails[Math.random()].ingredients;
+                          output = document.querySelector('#mainDrinkDetails');
+                          output.innerHTML = '';
+                          output.innerHTML = `<h2>${obj.name}</h2><p>${obj.ingredients}</p>`;
                           break;
                   }
                 } else if (xhr.status == 201) {
@@ -53,6 +53,16 @@
                     for (let drink in obj.drinksList) {
                         userDrinks.innerHTML += `<h2>${drink}</h2><p>${obj.drinksList[drink]}</p>`;
                     }
+                } else if (xhr.status == 404) {
+                    document.querySelector('#flexContainer').style.display = 'none';
+                    let errorDiv = document.createElement('div');
+                    errorDiv.innerHTML = `
+                        <h1>Cocktail API</h1>
+                        <hr>
+                        <h2 style='text-align: center'>This page does not exist</h2>
+                        <a style='text-align: center' href='client.html'>Click here to go back</a>
+                    `;
+                    document.querySelector('body').appendChild = errorDiv;
                 }
             }
         };
@@ -101,10 +111,25 @@
             return false;
         };
 
-        const sendGetOrHead = (e, form) => {
+        const sendGetOrHeadWithForm = (e, form) => {
             const method = form.getAttribute('method');
             const action = form.getAttribute('action');
-            const userDrinkSearchText = document.querySelector('#userDrinkSearchText');
+            let params = -1;
+            if (form.querySelector('.searchText')) {
+                const drinkSearchText = form.querySelector('.searchText');
+                params = `?drink=${drinkSearchText.value}`;
+            }
+
+            sendGetOrHead(e, method, action, params)
+        }
+
+        const sendGetOrHead = (e, method, _action, params = -1) => {
+            let action;
+            if (params != -1) {
+                action = _action += params;
+            } else {
+                action = _action;
+            }
 
             const xhr = new XMLHttpRequest();
             xhr.open(method, action);
@@ -117,10 +142,11 @@
               xhr.onload = () => handleResponse(xhr, false);
             }
 
-            const formData = `userDrink=${userDrinkSearchText.value}`;
+            xhr.send();
 
-            xhr.send(formData);
-            e.preventDefault();
+            if (e != -1) {
+                e.preventDefault();
+            }
 
             return false;
         }
@@ -132,28 +158,19 @@
             const userDrinkSearchForm = document.querySelector('#userDrinkSearchForm');
 
             const addDrink = (e) => sendPost(e, addDrinkForm);
-            const getDrink = (e) => sendGetOrHead(e, drinkSearchForm);
-            const getRandomDrink = (e) => sendGetOrHead(e, randomDrinkForm);
-            const getUserDrink = (e) => sendGetOrHead(e, userDrinkSearchForm);
+            const getDrink = (e) => sendGetOrHeadWithForm(e, drinkSearchForm);
+            const getRandomDrink = (e) => sendGetOrHeadWithForm(e, randomDrinkForm);
+            const getUserDrink = (e) => sendGetOrHeadWithForm(e, userDrinkSearchForm);
 
             addDrinkForm.addEventListener('submit', addDrink);
             drinkSearchForm.addEventListener('submit', getDrink);
             randomDrinkForm.addEventListener('submit', getRandomDrink);
             userDrinkSearchForm.addEventListener('submit', getUserDrink);
 
-            // get initial drink list
-            for (let drink in cocktails) {
-                let drinkName = document.createElement('h3');
-                let drinkIngredients = document.createElement('p');
-
-                drinkName.className = "drinkName";
-                drinkIngredients.className = "drinkIngredients";
-                drinkName.innerHTML = drink;
-                drinkIngredients.innerHTML = cocktails[drink];
-
-                document.querySelector('#drinks').appendChild(drinkName);
-                document.querySelector('#drinks').appendChild(drinkIngredients);
-            }
+            // get initial drinks
+            sendGetOrHead(-1, 'get', '/getDrink', `?drink=${''}`);
+            sendGetOrHead(-1, 'get', '/getUserDrink', `?drink=${''}`);
+            sendGetOrHead(-1, 'get', '/getRandomDrink');
         };
 
         window.onload = init;
@@ -168,24 +185,24 @@
             <input type="submit" value="Add Drink" />
         </form>
     </header>
+    <hr />
     <div id="flexContainer">
         <div id="fullList" class="flexItems">
             <form id="drinkSearchForm" class="search" action="/getDrink" method="get">
-                <input id="drinkSearchText" type="text" placeholder="Drink Name" />
-                <input type="submit" value="Search" />
+                <input id="drinkSearchText" class="searchText" type="text" placeholder="Drink Name" />
+                <input type="submit" value="Search"/>
             </form>
             <div id="drinks"></div>
         </div>
         <div id="mainDrink" class="flexItems">
-            <h2 id="mainDrinkName"></h2>
-            <p id="mainDrinkIngredients"></p>
             <form id="randomDrinkForm" action="/getRandomDrink" method="get">
                 <input type="submit" value="Random Drink" />
             </form>
+            <div id="mainDrinkDetails"></div>
         </div>
         <div id="userList" class="flexItems">
             <form id="userDrinkSearchForm" class="search" action="/getUserDrink" method="get">
-                <input id="userDrinkSearchText" type="text" placeholder="Drink Name" />
+                <input id="userDrinkSearchText" class="searchText" type="text" placeholder="Drink Name" />
                 <input type="submit" value="Search" />
             </form>
             <div id="userDrinks"><p>No drinks yet</p></div>
